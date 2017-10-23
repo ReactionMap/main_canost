@@ -1,0 +1,1605 @@
+****************************************************************
+             CHANGE_LOG           main_canost
+****************************************************************
+
+main_canost-2.92
+
+main_canost-2.91 からの変更点
+
+ 1. 不自然な炭素，酸素，窒素を許容するオプションを追加
+ 
+ 2. main_canost における数値の読み込みを安全なものに改良
+
+ 3．prune_branch をシンプルなものに変更
+
+ 4．permutable を一部修正
+
+----------------------------------------------------------------
+
+main_canost-2.91
+
+main_canost-2.9 からの変更点
+
+ 1. code.prior を読み込むことに戻す
+ 
+ 2. set_upper_level からlinearityを呼び出したとき，
+    親子関係がずれる問題を解消
+
+ 3．assign_cast_codeの配列の参照を修正
+
+----------------------------------------------------------------
+
+main_canost-2.9
+
+main_canost-2.87, 2.88, 2.89 からの変更点
+
+ 1．sym_substructure を変更，duplicate_levelsを追加
+
+ 2. prune_branch を改良．link のタイプにHITCHを追加
+   列挙しなくてよい環構造の範囲(定義)を拡大
+
+ 3．judge_sym_substruct をHITCHに合わせ変更
+
+ 4．intentional_ordering をHITCHに合わせ変更
+
+ 5. raise.c を raise_rank.c に改名
+
+ 6. set_upper_level.c の一部を再帰的に変更
+
+ 7. linearity関数の戻り値に関するバグを修正
+
+ 8. recognition.c をいくつかの関数に分ける
+
+ 9. first_sort, first_lexsort で link のタイプによっても
+    順位が付くように変更
+
+ 10. first_update_tuple のバグを修正
+
+ 11. linear_pair を修正(altair側が一直線の場合について)
+
+ 12. atomic_num 原子種に重水素を追加
+
+ 13. raise_and_order関数を追加
+
+ 14. main_canost, scan_children を結合数5以上の原子を含む
+     分子にも対応させる
+
+ 15. single_child を一直線の分子に対応するように修正
+
+ 使用している関数
+
+  main_casnot.h  共通のヘッダーファイル
+
+  main_casnot.c  main関数：molファイルの読み込み，分子グラフの作成
+   |
+   |-- atomic_num.c  原子番号をふる関数
+   |
+   |-- recognition.c  部分構造を認識してCANOSTコードをふる関数
+   |    |
+   |    |-- carbon_code.c  
+   |    |
+   |    |-- oygen_code.c
+   |    |
+   |    |-- halogen_code.c
+   |    |
+   |    |-- nitrogen_code.c
+   |
+   |-- assign_codeNum.c  CANOSTコードの優先順位をふる関数
+   |
+
+   以下，各原子で繰り返し
+
+   |
+   |-- fun_bfs.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- genAtom.c  仮想的な原子を加える関数
+   |    |
+   |    |-- utile_functions.c
+   |
+   |-- prune_branch.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- utile_functions.c
+   |
+   |-- canonicalization.c  層別ネットワークを規範化する関数
+        |
+        |-- first_sort.c  一回目のボトムアップの整列をする関数 
+        |    |
+        |    |-- first_update_tuple.c  1回目のtupleを更新する関数
+        |    |                         tupleには子の番号を入れる
+        |    |
+        |    |-- first_lexsort.c  子とCANOSTコードの順位で整列する関数
+        |    |
+        |    |-- tuple_cmp.c  tupleを比較する関数
+        |    |
+        |    |-- second_update_tuple.c  2回目のtupleを更新する関数
+        |                               tupleには子の順位を入れる
+        |
+        |-- sort_t_d.c  トップダウンに整列する関数
+        |    |
+        |    |-- update_tuple.c  tupleを更新する関数
+        |    |
+        |    |-- lexsort.c tupleに関して整列する関数
+        |
+        |-- ordering.c  sort_b_u と sort_t_d を繰り返す関数
+        |    |
+        |    |-- sort_b_u.c ボトムアップに整列する関数
+        |    |    |
+        |    |    |-- update_tuple.c  tupleを更新する関数
+        |    |    |
+        |    |    |-- lexsort.c tupleに関して整列する関数
+        |    |
+        |    |-- sort_t_d.c
+        |
+        |       |-- duplicate_levels.c sym_substructureのために
+        |       |                      層をコピーしておく関数
+        |  |--- |
+        |  |    |-- set_atom.c CASTを利用して順位付けする関数
+        |  |    |    |
+        |  |    |    |-- set_upper_level.c 上位層の原子の順位付けを行う関数
+        |  |    |         |              
+        |  |    |         |-- set_upper_level.c 再帰的呼び出し 
+        |  |    |         |
+        |  |    |         |-- rank_and_order.c
+        |  |    |         |    |
+        |  |    |         |    |-- raise_rank.c  ひとつの原子の順位を高くする関数
+        |  |    |         |    |
+        |  |    |         |    |-- ordering.c
+        |  |    |         |
+        |  |    |         |-- single_child.c レベル 1 の層がひとつの原子からなるとき
+        |  |    |         |    |           呼び出される関数
+        |  |    |         |    |
+        |  |    |         |    |-- set_children.c 子の順位を決める関数
+        |  |    |         |    |
+        |  |    |         |    |-- scan_children.c 子の構成を調べる関数
+        |  |    |         |
+        |  |    |         |  |-- linear_pair.c レベル 1 の層が二つの原子からなり，
+        |  |    |         |  |               始点と一直線のとき呼び出される関数
+        |  |    |         |--|
+        |  |    |         |  |-- broken_line_pair.c レベル 1 の層が二つの原子からなり，
+        |  |    |         |                       始点と一直線ではないとき呼び出される関数
+        |  |    |         |
+        |  |    |         |-- distiguish_competitive_atoms レベル 1 の層が三つ以上の原子から
+        |  |    |         |                                なるとき呼び出される関数(1)
+        |  |    |         |                                ひとつだけ順位が高い
+        |  |    |         |
+        |  |    |         |-- distiguish_competitive_atoms2 レベル 1 の層が三つ以上の原子から
+        |  |    |         |                                 なるとき呼び出される関数(2)
+        |  |    |         |                                 二つの異なる順位の原子が存在
+        |  |    |         |
+        |  |    |         |-- arrange_ordered_atoms.c レベル 1 の層が三つ以上の原子からなり，
+        |  |    |         |                           全てが異なる順位を持つとき呼び出される関数
+        |  |    |         |
+        |--|    |         |-- apply_cast.c CASTコードをふる関数
+           |    |         |
+           |    |         |-- identify_parent.c 親を特定する関数
+           |    |         |
+           |    |         |-- identify_ancestors.c 二面角を決める原子を決める関数
+           |    |         |
+           |    |         |-- assign_cast_code.c CASTコードをふる関数
+           |    |         |    |
+           |    |         |    |-- calculate_dihedral_angle.c 二面角を計算する関数
+           |    |         |    |
+           |    |         |    |-- get_dihedral_angle.c CASTコードを返す関数
+           |    |         |
+           |    |         |-- ordering_on_cast.c CASTに基づいて順位付けする関数
+           |    |         |    |
+           |    |         |    |-- geometric_order.c 順位を決める関数
+           |    |         |
+           |    |         |-- genlnr_code.c CANOST表記を生成する関数
+           |    |              |
+           |    |              |-- bonds_sort.c  順位にしたがって結合を整列
+           |    |              |
+           |    |              |-- filiation.c 親子関係を出力する関数
+           |    |
+           |    |-- sym_substructure.c 対称な部分構造を出力する関数
+           |    |
+           |    |-- judge_sym_substruct.c 対称な部分構造をまとめて出力
+           |                              する関数
+           |
+           |-- split_component.c  2層間の連結成分に分解，順位付けする関数
+                |
+                |       |-- duplicate_levels.c
+                |  |--- |
+                |  |    |-- set_atom.c
+                |  |    |
+                |  |    |-- sym_substructure.c 対称な部分構造を出力する関数
+                |  |    |
+                |  |    |-- judge_sym_substruct.c  
+                |--|                
+                   |-- permutable.c 成分の大きさで順位付け 
+                        |
+                        |-- duplicate_levels.c
+                        |
+                        |  |-- set_atom.c.c
+                        |--|
+                        |  |--intentional_ordering.c  強制的に順位付けをする関数
+                        |      |                      全列挙する関数
+                        |      |
+                        |      |-- raise_rank.c  ひとつの原子の順位を高くする関数
+                        |      |
+                        |      |-- ordering.c
+                        |      |
+                        |      |-- set_atom.c
+                        |      |
+                        |      |-- intentional_ordering.c  再帰的に呼出し
+                        |
+                        |-- sym_substructure.c
+                        |
+                        |-- judge_sym_substruct.c
+
+----------------------------------------------------------------
+
+main_canost-2.87
+
+ main_canost-2.86 からの変更点
+
+ 1．分子中の各原子を先頭にした規範的なCANOSTコードを出力する
+    オプション -e を追加
+
+ 2．対称な構造であることを(最終的に)判定する関数
+    judge_sym_substruct を追加．
+
+ 3. utile_functions の joingroupを修正
+
+ 使用している関数
+
+  main_casnot.h  共通のヘッダーファイル
+
+  main_casnot.c  main関数：molファイルの読み込み，分子グラフの作成
+   |
+   |-- atomic_num.c  原子番号をふる関数
+   |
+   |-- recognition.c  部分構造を認識してCANOSTコードをふる関数
+   |
+   |-- assign_codeNum.c  CANOSTコードの優先順位をふる関数
+   |
+
+   以下，各原子で繰り返し
+
+   |
+   |-- fun_bfs.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- genAtom.c  仮想的な原子を加える関数
+   |    |
+   |    |-- utile_functions.c
+   |
+   |-- prune_branch.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- utile_functions.c
+   |
+   |-- canonicalization.c  層別ネットワークを規範化する関数
+        |
+        |-- first_sort.c  一回目のボトムアップの整列をする関数 
+        |    |
+        |    |-- first_update_tuple.c  1回目のtupleを更新する関数
+        |    |                         tupleには子の番号を入れる
+        |    |
+        |    |-- first_lexsort.c  子とCANOSTコードの順位で整列する関数
+        |    |
+        |    |-- tuple_cmp.c  tupleを比較する関数
+        |    |
+        |    |-- second_update_tuple.c  2回目のtupleを更新する関数
+        |                               tupleには子の順位を入れる
+        |
+        |-- sort_t_d.c  トップダウンに整列する関数
+        |    |
+        |    |-- update_tuple.c  tupleを更新する関数
+        |    |
+        |    |-- lexsort.c tupleに関して整列する関数
+        |
+        |-- ordering.c  sort_b_u と sort_t_d を繰り返す関数
+        |    |
+        |    |-- sort_b_u.c ボトムアップに整列する関数
+        |    |    |
+        |    |    |-- update_tuple.c  tupleを更新する関数
+        |    |    |
+        |    |    |-- lexsort.c tupleに関して整列する関数
+        |    |
+        |    |-- sort_t_d.c
+        |
+        |       |-- sym_substructure.c 対称な部分構造を出力する関数
+        |  |--- |
+        |  |    |-- set_atom.c CASTを利用して順位付けする関数
+        |  |    |    |
+        |  |    |    |-- set_upper_level 上位層の原子の順位付けを行う関数
+        |  |    |         |
+        |  |    |         |-- single_child レベル 1 の層がひとつの原子からなるとき
+        |  |    |         |    |           呼び出される関数
+        |  |    |         |    |
+        |  |    |         |    |-- set_children 子の順位を決める関数
+        |  |    |         |    |
+        |  |    |         |    |-- scan_children 子の構成を調べる関数
+        |  |    |         |
+        |  |    |         |  |-- linear_pair レベル 1 の層が二つの原子からなり，
+        |  |    |         |  |               始点と一直線のとき呼び出される関数
+        |  |    |         |--|
+        |  |    |         |  |-- broken_line_pair レベル 1 の層が二つの原子からなり，
+        |  |    |         |                       始点と一直線ではないとき呼び出される関数
+        |  |    |         |
+        |  |    |         |-- distiguish_competitive_atoms レベル 1 の層が三つ以上の原子から
+        |  |    |         |                                なるとき呼び出される関数(1)
+        |  |    |         |                                ひとつだけ順位が高い
+        |  |    |         |
+        |  |    |         |-- distiguish_competitive_atoms2 レベル 1 の層が三つ以上の原子から
+        |  |    |         |                                 なるとき呼び出される関数(2)
+        |  |    |         |                                 二つの異なる順位の原子が存在
+        |  |    |         |
+        |  |    |         |-- arrange_ordered_atoms レベル 1 の層が三つ以上の原子からなり，
+        |  |    |         |                         全てが異なる順位を持つとき呼び出される関数
+        |  |    |         |
+        |  |    |         |-- apply_cast.c CASTコードをふる関数
+        |  |    |         |
+        |  |    |         |-- identify_parent.c 親を特定する関数
+        |  |    |         |
+        |  |    |         |-- identify_ancestors.c 二面角を決める原子を決める関数
+        |  |    |         |
+        |  |    |         |-- assign_cast_code.c CASTコードをふる関数
+        |  |    |         |    |
+        |  |    |         |    |-- calculate_dihedral_angle.c 二面角を計算する関数
+        |  |    |         |    |
+        |  |    |         |    |-- get_dihedral_angle.c CASTコードを返す関数
+        |  |    |         |
+        |  |    |         |-- ordering_on_cast.c CASTに基づいて順位付けする関数
+        |  |    |         |    |
+        |  |    |         |    |-- geometric_order.c 順位を決める関数
+        |  |    |         |
+        |  |    |         |-- genlnr_code.c CANOST表記を生成する関数
+        |  |    |              |
+        |  |    |              |-- bonds_sort.c  順位にしたがって結合を整列
+        |--|    |              |
+           |    |              |-- filiation.c 親子関係を出力する関数
+           |    |
+           |    |-- judge_sym_substruct.c 対称な部分構造をまとめて出力
+           |                              する関数
+           |
+           |-- split_component.c  2層間の連結成分に分解，順位付けする関数
+                |
+                |       |-- sym_substructure.c 対称な部分構造を出力する関数
+                |  |--- |
+                |  |    |-- set_atom.c
+                |  |    |
+                |  |    |-- judge_sym_substruct.c  
+                |--|                
+                   |-- permutable.c 成分の大きさで順位付け 
+                        |
+                        |-- sym_substrucuture.c
+                        |
+                        |  |-- set_atom.c.c
+                        |--|
+                        |  |--intentional_ordering.c  強制的に順位付けをする関数
+                        |      |                      全列挙する関数
+                        |      |
+                        |      |-- raise.c  ひとつの原子の順位を高くする関数
+                        |      |
+                        |      |-- ordering.c
+                        |      |
+                        |      |-- set_atom.c
+                        |      |
+                        |      |-- intentional_ordering.c  再帰的に呼出し
+                        |
+                        |-- judge_sym_substruct.c
+
+
+   utile_function.c
+    |
+    |-- small_to_capital 小文字の入力を大文字に変換する関数
+    |
+    |-- intialize_primary_queue.c  primary_queueを初期化する関数
+    |
+    |-- add_primary_queue.c primary_queueにひとつ要素を加える関数
+    |
+    |-- remove_primary_queue.c primary_queueからひとつ要素を取り出す関数
+    |
+    |-- intialize_second_queue.c  second_queueを初期化する関数
+    |
+    |-- add_second_queue.c second_queueにひとつ要素を加える関数
+    |
+    |-- remove_second_queue.c second_queueからひとつ要素を取り出す関数
+    |
+    |-- initgroup union-findの初期化
+    |
+    |-- findgroup find関数
+    |
+    |-- joingroup 二つのグループを統合する関数
+    |
+    |-- join  二つのグループを統合するための計算をする関数
+    |
+    |-- comp_int_array 二つのint配列を先頭から比較し，辞書式に小さい方
+                       を判定する関数
+
+----------------------------------------------------------------
+
+main_canost-2.86
+
+ main_canost-2.85 からの変更点
+
+ 1. 分子に対する規範的なCANOSTコードを出力するオプション -u を追加
+ 
+----------------------------------------------------------------
+
+main_canost-2.85
+
+ main_canost-2.84 からの変更点
+
+ 1．identify_ancestor による結合の直線性の判定を廃止．直線性を判定
+    する関数として linearity の追加
+
+ 2．arrange_ordered_atoms,broken_line_pair,linear_pair,
+    distinguish_competitive_atoms,distinguish_competitive_atoms2,
+    single_child において始点周りで結合が直線の場合は，直線でなくなる
+    まで探索して子に順位を付けるように改良
+
+ 3．geometric_order,identify_ancestors,scan_children を修正
+
+----------------------------------------------------------------
+
+main_canost-2.84
+ 
+ main_canost-2.83 からの変更点
+
+ 1．CASTコードが異なるものが存在する可能性があるものは別途出力する
+    オプションを設定( -d オプション )
+
+ 2. apply_cast,arrange_ordered_atoms,geometric_order,broken_line_pair
+    linear_pair,distinguish_competitive_atoms,
+    distinguish_competitive_atoms2,identify_ancestors, 
+    single_child を1に伴い修正
+
+ 3．その他関数も若干修正
+ 
+----------------------------------------------------------------
+
+main_canost-2.83
+
+ main_canost-2.82 からの変更点
+
+ 1. prune_branch を改良
+    単独の環の場合は全列挙しない
+
+----------------------------------------------------------------
+
+main_canost-2.82
+
+ main_canost-2.81 からの変更点
+
+ 1．レベルを指定し，そのレベルまでのCANOST表記を生成する
+    オプションを追加
+    レベルの制限のために confine_level.c を追加
+    レベル指定による処理の変更により多くの関数を改良
+
+----------------------------------------------------------------
+
+main_canost-2.81
+
+ main_canost-2.8 からの変更点
+
+ 1. prune_branch を深さ優先探索法に変更
+    これに伴い，utile_functionsも変更
+
+ 2．変数 top,reef の再初期化を徹底
+    apply_castの呼び出しに関するバグを修正
+    main_casnot-2.8 にもこの修正は適用
+
+ 3. bonds_sort を改良
+
+ 4. main_canost.c, genlnr_code.c のメモリ開放を修正
+
+----------------------------------------------------------------
+
+main_casnot-2.8
+
+ main_canost-2.72 からの変更点
+
+  1．上位層の順位付けを変更
+     set_upper_level などの関数を採用
+     上位層の原子も立体構造に基づいて順位付け
+
+ 使用している関数
+
+  main_casnot.h  共通のヘッダーファイル
+
+  main_casnot.c  main関数：molファイルの読み込み，分子グラフの作成
+   |
+   |-- atomic_num.c  原子番号をふる関数
+   |
+   |-- recognition.c  部分構造を認識してCANOSTコードをふる関数
+   |
+   |-- assign_codeNum.c  CANOSTコードの優先順位をふる関数
+   |
+
+   以下，各原子で繰り返し
+
+   |
+   |-- fun_bfs.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- genAtom.c  仮想的な原子を加える関数
+   |    |
+   |    |-- utile_functions.c
+   |
+   |-- prune_branch.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- utile_functions.c
+   |
+   |-- canonicalization.c  層別ネットワークを規範化する関数
+        |
+        |-- first_sort.c  一回目のボトムアップの整列をする関数 
+        |    |
+        |    |-- first_update_tuple.c  1回目のtupleを更新する関数
+        |    |                         tupleには子の番号を入れる
+        |    |
+        |    |-- first_lexsort.c  子とCANOSTコードの順位で整列する関数
+        |    |
+        |    |-- tuple_cmp.c  tupleを比較する関数
+        |    |
+        |    |-- second_update_tuple.c  2回目のtupleを更新する関数
+        |                               tupleには子の順位を入れる
+        |
+        |-- sort_t_d.c  トップダウンに整列する関数
+        |    |
+        |    |-- update_tuple.c  tupleを更新する関数
+        |    |
+        |    |-- lexsort.c tupleに関して整列する関数
+        |
+        |-- ordering.c  sort_b_u と sort_t_d を繰り返す関数
+        |    |
+        |    |-- sort_b_u.c ボトムアップに整列する関数
+        |    |    |
+        |    |    |-- update_tuple.c  tupleを更新する関数
+        |    |    |
+        |    |    |-- lexsort.c tupleに関して整列する関数
+        |    |
+        |    |-- sort_t_d.c
+        |
+        |       |-- sym_substructure.c 対称な部分構造を出力する関数
+        |  |--- |
+        |  |    |-- set_atom.c CASTを利用して順位付けする関数
+        |  |         |
+        |  |         |-- set_upper_level 上位層の原子の順位付けを行う関数
+        |  |              |
+        |  |              |-- single_child レベル 1 の層がひとつの原子からなるとき
+        |  |              |    |           呼び出される関数
+        |  |              |    |
+        |  |              |    |-- set_children 子の順位を決める関数
+        |  |              |    |
+        |  |              |    |-- scan_children 子の構成を調べる関数
+        |  |              |
+        |  |              |  |-- linear_pair レベル 1 の層が二つの原子からなり，
+        |  |              |  |               始点と一直線のとき呼び出される関数
+        |  |              |--|
+        |  |              |  |-- broken_line_pair レベル 1 の層が二つの原子からなり，
+        |  |              |                       始点と一直線ではないとき呼び出される関数
+        |  |              |
+        |  |              |-- distiguish_competitive_atoms レベル 1 の層が三つ以上の原子から
+        |  |              |                                なるとき呼び出される関数(1)
+        |  |              |                                ひとつだけ順位が高い
+        |  |              |
+        |  |              |-- distiguish_competitive_atoms2 レベル 1 の層が三つ以上の原子から
+        |  |              |                                 なるとき呼び出される関数(2)
+        |  |              |                                 二つの異なる順位の原子が存在
+        |  |              |
+        |  |              |-- arrange_ordered_atoms レベル 1 の層が三つ以上の原子からなり，
+        |  |              |                         全てが異なる順位を持つとき呼び出される関数
+        |  |              |
+        |  |              |-- apply_cast.c CASTコードをふる関数
+        |  |              |
+        |  |              |-- identify_parent.c 親を特定する関数
+        |  |              |
+        |  |              |-- identify_ancestors.c 二面角を決める原子を決める関数
+        |  |              |
+        |  |              |-- assign_cast_code.c CASTコードをふる関数
+        |  |              |    |
+        |  |              |    |-- calculate_dihedral_angle.c 二面角を計算する関数
+        |  |              |    |
+        |  |              |    |-- get_dihedral_angle.c CASTコードを返す関数
+        |  |              |
+        |  |              |-- ordering_on_cast.c CASTに基づいて順位付けする関数
+        |  |              |    |
+        |  |              |    |-- geometric_order.c 順位を決める関数
+        |  |              |
+        |  |              |-- genlnr_code.c CANOST表記を生成する関数
+        |  |                   |
+        |  |                   |-- bonds_sort.c  順位にしたがって結合を整列
+        |--|                   |
+           |                   |-- filiation.c 親子関係を出力する関数
+           |
+           |-- split_component.c  2層間の連結成分に分解，順位付けする関数
+                |
+                |-- union_find.c union-find を行う関数
+                |
+                |       |-- sym_substructure.c 対称な部分構造を出力する関数
+                |  |--- |
+                |  |    |-- set_atom.c
+                |--|                
+                   |-- permutable.c 成分の大きさで順位付け 
+                        |
+                        |-- sym_substrucuture.c
+                        |
+                        |  |-- set_atom.c.c
+                        |--|
+                           |--intentional_ordering.c  強制的に順位付けをする関数
+                               |                      全列挙する関数
+                               |
+                               |-- raise.c  ひとつの原子の順位を高くする関数
+                               |
+                               |-- ordering.c
+                               |
+                               |-- set_atom.c
+                               |
+                               |-- intentional_ordering.c  再帰的に呼出し
+
+----------------------------------------------------------------
+
+main_casnot-2.72
+
+ main_casnot-2.71 からの変更点
+
+  1．direct_parent などのメモリを確保する関数を変更
+
+  2．ordering_on_cast.c 中の sort_t_d.c を若干効率的に変更
+
+----------------------------------------------------------------
+
+main_casnot-2.71
+
+ main_casnot-2.7 からの変更点
+
+  1．assign_cast_code.c の変更
+      指定された原子に対してCASTコードをふる関数
+
+  2．canonicalization.c の変更
+      set_atom.c を呼び出すようにする
+
+  3．geometric_order.c の追加
+      同順位の原子らにCASTコードに基づく順位付けをする関数
+
+  4．ordering_on_cast.c の追加
+      CASTコードに基づく順位付けをする関数      
+
+  5．set_atom.c，apply_cast.c  の追加
+   
+  6．全体的なメモリ管理の見直し
+
+
+ 使用している関数
+
+  main_casnot.h  共通のヘッダーファイル
+
+  main_casnot.c  main関数：molファイルの読み込み，分子グラフの作成
+   |
+   |-- atomic_num.c  原子番号をふる関数
+   |
+   |-- recognition.c  部分構造を認識してCANOSTコードをふる関数
+   |
+   |-- assign_codeNum.c  CANOSTコードの優先順位をふる関数
+   |
+
+   以下，各原子で繰り返し
+
+   |
+   |-- fun_bfs.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- genAtom.c  仮想的な原子を加える関数
+   |    |
+   |    |-- myqueue.c
+   |
+   |-- prune_branch.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- myqueue.c
+   |
+   |-- canonicalization.c  層別ネットワークを規範化する関数
+        |
+        |-- first_sort.c  一回目のボトムアップの整列をする関数 
+        |    |
+        |    |-- first_update_tuple.c  1回目のtupleを更新する関数
+        |    |                         tupleには子の番号を入れる
+        |    |
+        |    |-- first_lexsort.c  子とCANOSTコードの順位で整列する関数
+        |    |
+        |    |-- tuple_cmp.c  tupleを比較する関数
+        |    |
+        |    |-- second_update_tuple.c  2回目のtupleを更新する関数
+        |                               tupleには子の順位を入れる
+        |
+        |-- sort_t_d.c  トップダウンに整列する関数
+        |    |
+        |    |-- update_tuple.c  tupleを更新する関数
+        |    |
+        |    |-- lexsort.c tupleに関して整列する関数
+        |
+        |-- ordering.c  sort_b_u と sort_t_d を繰り返す関数
+        |    |
+        |    |-- sort_b_u.c ボトムアップに整列する関数
+        |    |    |
+        |    |    |-- update_tuple.c  tupleを更新する関数
+        |    |    |
+        |    |    |-- lexsort.c tupleに関して整列する関数
+        |    |
+        |    |-- sort_t_d.c
+        |
+        |  |-- sym_substructure.c 対称な部分構造を出力する関数
+        |  |    |
+        |  |    |-- set_atom.c CASTを利用して順位付けする関数
+        |  |         |
+        |  |         |-- apply_cast.c CASTコードをふる関数
+        |  |         |    |
+        |  |         |    |-- identify_parent.c 親を特定する関数
+        |  |         |    |
+        |  |         |    |-- identify_ancestors.c 二面角を決める原子を決める関数
+        |  |         |    |
+        |  |         |    |-- assign_cast_code.c CASTコードをふる関数
+        |  |         |    |    |
+        |  |         |    |    |-- calculate_dihedral_angle.c 二面角を計算する関数
+        |  |         |    |    |
+        |  |         |    |    |-- get_dihedral_angle.c CASTコードを返す関数
+        |  |         |    |
+        |  |         |    |-- ordering_on_cast.c CASTに基づいて順位付けする関数
+        |  |         |         |
+        |  |         |         |-- geometric_order.c 順位を決める関数
+        |  |         |
+        |  |         |-- genlnr_code.c CANOST表記を生成する関数
+        |  |              |
+        |  |              |-- bonds_sort.c  順位にしたがって結合を整列
+        |--|              |
+           |              |-- filiation.c 親子関係を出力する関数
+           |
+           |-- split_component.c  2層間の連結成分に分解，順位付けする関数
+                |
+                |-- union_find.c union-find を行う関数
+                |
+                |  |-- sym_substructure.c 対称な部分構造を出力する関数
+                |  |    |
+                |  |    |-- set_atom.c
+                |--|                
+                   |-- permutable.c 成分の大きさで順位付け 
+                        |
+                        |-- sym_substrucuture.c
+                        |
+                        |  |-- set_atom.c.c
+                        |--|
+                           |--intentional_ordering.c  強制的に順位付けをする関数
+                               |                      全列挙する関数
+                               |
+                               |-- raise.c  ひとつの原子の順位を高くする関数
+                               |
+                               |-- ordering.c
+                               |
+                               |-- set_atom.c
+                               |
+                               |-- intentional_ordering.c  再帰的に呼出し
+
+
+----------------------------------------------------------------
+
+main_casnot-2.7  テスト版 アルゴリズムは未完成
+
+ main_casnot-2.62 からの変更点
+
+  立体構造の情報を利用したCANOST表記の生成法に向けて2.62より開発
+
+  1．prune_branch.c の改良
+      より厳密に環構造上の原子か否かを判定する関数
+
+  2．initialize_queue など各層ごとの Queue を用意するための関数の追加
+      utile_functions.c の中
+
+  3．identify_parent.c の追加
+      層別ネットワークの親を特定するための関数
+
+  4. identify_ancestors.c の追加
+      二面角を決める原子を決める関数
+
+  5．calculate_dihedral_angle.c の追加
+      二面角を計算する関数
+
+  6．get_dihedral_angle.c の追加
+      CASTコードを決める関数
+
+  7．assign_cast_code.c の追加
+      CASTコードをふる関数
+
+----------------------------------------------------------------
+
+main_casnot-2.62
+
+ main_casnot-2.61 からの変更点
+
+  1．toupper の利用をやめて，small_to_capital.c を利用
+
+  2．myqueue.c と union_find.c を utile_functions.c にまとめる．
+
+----------------------------------------------------------------
+
+main_casnot-2.61 
+
+ main_casnot-2.6 からの変更点
+
+  1．細かい修正
+
+  2．split_component.c のバグを修正
+
+----------------------------------------------------------------
+
+main_casnot-2.6
+
+ main_casnot-2.5 からの変更点
+
+  1．permutable.c の変更 ( 問題点の解決 )
+      成分の大きさによる順位付けのみ行うことにする
+
+  2．canonicalization.c の変更
+
+
+  使用している関数
+
+  main_casnot.h  共通のヘッダーファイル
+
+  main_casnot.c  main関数：molファイルの読み込み，分子グラフの作成
+   |
+   |-- atomic_num.c  原子番号をふる関数
+   |
+   |-- recognition.c  部分構造を認識してCANOSTコードをふる関数
+   |
+   |-- assign_codeNum.c  CANOSTコードの優先順位をふる関数
+   |
+
+   以下，各原子で繰り返し
+
+   |
+   |-- fun_bfs.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- genAtom.c  仮想的な原子を加える関数
+   |    |
+   |    |-- myqueue.c
+   |
+   |-- prune_branch.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- myqueue.c
+   |
+   |-- canonicalization.c  層別ネットワークを規範化する関数
+        |
+        |-- first_sort.c  一回目のボトムアップの整列をする関数 
+        |    |
+        |    |-- first_update_tuple.c  1回目のtupleを更新する関数
+        |    |                         tupleには子の番号を入れる
+        |    |
+        |    |-- first_lexsort.c  子とCANOSTコードの順位で整列する関数
+        |    |
+        |    |-- tuple_cmp.c  tupleを比較する関数
+        |    |
+        |    |-- second_update_tuple.c  2回目のtupleを更新する関数
+        |                               tupleには子の順位を入れる
+        |
+        |-- sort_t_d.c  トップダウンに整列する関数
+        |    |
+        |    |-- update_tuple.c  tupleを更新する関数
+        |    |
+        |    |-- lexsort.c tupleに関して整列する関数
+        |
+        |-- ordering.c  sort_b_u と sort_t_d を繰り返す関数
+        |    |
+        |    |-- sort_b_u.c ボトムアップに整列する関数
+        |    |    |
+        |    |    |-- update_tuple.c  tupleを更新する関数
+        |    |    |
+        |    |    |-- lexsort.c tupleに関して整列する関数
+        |    |
+        |    |-- sort_t_d.c
+        |
+        |  |-- sym_substructure.c 対称な部分構造を出力する関数
+        |  |    |
+        |  |    |-- genlnr_code.c CANOST表記を生成する関数
+        |  |         |
+        |  |         |-- bonds_sort.c  順位にしたがって結合を整列
+        |--|         |
+           |         |-- filiation.c 親子関係を出力する関数
+           |
+           |-- split_component.c  2層間の連結成分に分解，順位付けする関数
+                |
+                |-- union_find.c union-find を行う関数
+                |
+                |  |-- sym_substructure.c 対称な部分構造を出力する関数
+                |  |    |
+                |  |    |-- genlnr_code.c
+                |--|                
+                   |-- permutable.c 成分の大きさで順位付け 
+                        |
+                        |-- sym_substrucuture.c
+                        |
+                        |  |-- genlnr_code.c
+                        |--|
+                           |--intentional_ordering.c  強制的に順位付けをする関数
+                               |                      全列挙する関数
+                               |
+                               |-- raise.c  ひとつの原子の順位を高くする関数
+                               |
+                               |-- ordering.c
+                               |
+                               |-- genlnr_code.c
+                               |
+                               |-- intentional_ordering.c  再帰的に呼出し
+
+
+   myqueue.c 
+    |
+    |-- intialize_primary_queue.c  primary_queueを初期化する関数 
+    |
+    |-- add_primary_queue.c primary_queueにひとつ要素を加える関数
+    |
+    |-- remove_primary_queue.c primary_queueからひとつ要素を取り出す関数
+    |
+    |-- intialize_second_queue.c  second_queueを初期化する関数 
+    |
+    |-- add_second_queue.c second_queueにひとつ要素を加える関数
+    |
+    |-- remove_second_queue.c second_queueからひとつ要素を取り出す関数
+
+----------------------------------------------------------------
+
+main_casnot-2.5 アルゴリズムに問題あり
+
+ main_canost-2.4 からの変更点
+
+  1．split_component.c の修正
+      try_or_skip の使用
+
+  2．clipping.c の廃止
+
+  3．permutable.c の変更 ( 問題点は解消していない )
+      STEM な原子( permutable.c で1個からなる成分になる原子 )が
+      存在したら，成分の大きさのみの順位付けを行う．
+
+
+  使用している関数
+
+  main_casnot.h  共通のヘッダーファイル
+
+  main_casnot.c  main関数：molファイルの読み込み，分子グラフの作成
+   |
+   |-- atomic_num.c  原子番号をふる関数
+   |
+   |-- recognition.c  部分構造を認識してCANOSTコードをふる関数
+   |
+   |-- assign_codeNum.c  CANOSTコードの優先順位をふる関数
+   |
+
+   以下，各原子で繰り返し
+
+   |
+   |-- fun_bfs.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- genAtom.c  仮想的な原子を加える関数
+   |    |
+   |    |-- myqueue.c
+   |
+   |-- prune_branch.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- myqueue.c
+   |
+   |-- canonicalization.c  層別ネットワークを規範化する関数
+        |
+        |-- first_sort.c  一回目のボトムアップの整列をする関数 
+        |    |
+        |    |-- first_update_tuple.c  1回目のtupleを更新する関数
+        |    |                         tupleには子の番号を入れる
+        |    |
+        |    |-- first_lexsort.c  子とCANOSTコードの順位で整列する関数
+        |    |
+        |    |-- tuple_cmp.c  tupleを比較する関数
+        |    |
+        |    |-- second_update_tuple.c  2回目のtupleを更新する関数
+        |                               tupleには子の順位を入れる
+        |
+        |-- sort_t_d.c  トップダウンに整列する関数
+        |    |
+        |    |-- update_tuple.c  tupleを更新する関数
+        |    |
+        |    |-- lexsort.c tupleに関して整列する関数
+        |
+        |-- ordering.c  sort_b_u と sort_t_d を繰り返す関数
+        |    |
+        |    |-- sort_b_u.c ボトムアップに整列する関数
+        |    |    |
+        |    |    |-- update_tuple.c  tupleを更新する関数
+        |    |    |
+        |    |    |-- lexsort.c tupleに関して整列する関数
+        |    |
+        |    |-- sort_t_d.c
+        |
+        |  |-- sym_substructure.c 対称な部分構造を出力する関数
+        |  |    |
+        |  |    |-- genlnr_code.c CANOST表記を生成する関数
+        |  |         |
+        |  |         |-- bonds_sort.c  順位にしたがって結合を整列
+        |--|         |
+           |         |-- filiation.c 親子関係を出力する関数
+           |
+           |-- split_component.c  2層間の連結成分に分解，順位付けする関数
+                |
+                |-- union_find.c union-find を行う関数
+                |
+                |-- sym_substructure.c 対称な部分構造を出力する関数
+                |
+                |  |-- genlnr_code.c
+                |--|                
+                   |-- permutable.c 成分の大きさで順位付け 
+                        |
+                        |  |-- genlnr_code.c
+                        |--|
+                           |  |-- permutable.c 成分内で順位付け
+			   |  |    |
+                           |--|    |  |-- genlenr_code.c
+                              |    |--|
+                              |       |--intentional_ordering.c  強制的に順位付けをする関数
+                              |           |                      全列挙する関数
+                              |           |
+                              |           |-- raise.c  ひとつの原子の順位を高くする関数
+                              |           |
+                              |           |-- ordering.c
+                              |           |
+                              |           |-- genlnr_code.c
+                              |           |
+                              |           |-- intentional_ordering.c  再帰的に呼出し
+                              |
+                              |-- intentional_ordering.c
+
+   myqueue.c 
+    |
+    |-- intialize_primary_queue.c  primary_queueを初期化する関数 
+    |
+    |-- add_primary_queue.c primary_queueにひとつ要素を加える関数
+    |
+    |-- remove_primary_queue.c primary_queueからひとつ要素を取り出す関数
+    |
+    |-- intialize_second_queue.c  second_queueを初期化する関数 
+    |
+    |-- add_second_queue.c second_queueにひとつ要素を加える関数
+    |
+    |-- remove_second_queue.c second_queueからひとつ要素を取り出す関数
+
+----------------------------------------------------------------
+
+main_casnot-2.4 アルゴリズムに問題あり
+
+ main_casnot-2.3 からの変更点
+
+  1．component.c から split_component.c へ名前の変更
+
+  2．recognition.c の修正
+
+  3．split_component.c の変更
+      2層間の連結成分をさらに子の種類によって別々に順位付け
+
+  4．clipping.c の追加
+      原子が KNAG ( COUPLEな原子の上のCOUPLEな原子 )か否か判定する関数
+
+  5．permutable.c の変更 ( 2.3の問題点を解消していない)
+      原子が KNAG ならば，成分の大きさによる順位付けのみ行うようにする
+
+
+  使用している関数
+
+  main_casnot.h  共通のヘッダーファイル
+
+  main_casnot.c  main関数：molファイルの読み込み，分子グラフの作成
+   |
+   |-- atomic_num.c  原子番号をふる関数
+   |
+   |-- recognition.c  部分構造を認識してCANOSTコードをふる関数
+   |
+   |-- assign_codeNum.c  CANOSTコードの優先順位をふる関数
+   |
+
+   以下，各原子で繰り返し
+
+   |
+   |-- fun_bfs.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- genAtom.c  仮想的な原子を加える関数
+   |    |
+   |    |-- myqueue.c
+   |
+   |-- prune_branch.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- myqueue.c
+   |
+   |-- canonicalization.c  層別ネットワークを規範化する関数
+        |
+        |-- first_sort.c  一回目のボトムアップの整列をする関数 
+        |    |
+        |    |-- first_update_tuple.c  1回目のtupleを更新する関数
+        |    |                         tupleには子の番号を入れる
+        |    |
+        |    |-- first_lexsort.c  子とCANOSTコードの順位で整列する関数
+        |    |
+        |    |-- tuple_cmp.c  tupleを比較する関数
+        |    |
+        |    |-- second_update_tuple.c  2回目のtupleを更新する関数
+        |                               tupleには子の順位を入れる
+        |
+        |-- sort_t_d.c  トップダウンに整列する関数
+        |    |
+        |    |-- update_tuple.c  tupleを更新する関数
+        |    |
+        |    |-- lexsort.c tupleに関して整列する関数
+        |
+        |-- ordering.c  sort_b_u と sort_t_d を繰り返す関数
+        |    |
+        |    |-- sort_b_u.c ボトムアップに整列する関数
+        |    |    |
+        |    |    |-- update_tuple.c  tupleを更新する関数
+        |    |    |
+        |    |    |-- lexsort.c tupleに関して整列する関数
+        |    |
+        |    |-- sort_t_d.c
+        |
+        |-- sym_substructure.c 対称な部分構造を出力する関数
+        |
+        |  |-- genlnr_code.c CANOST表記を生成する関数
+        |  |    |
+        |  |    |-- bonds_sort.c  順位にしたがって結合を整列
+        |--|    |
+           |    |-- filiation.c 親子関係を出力する関数
+           |
+           |-- split_component.c  2層間の連結成分に分解，順位付けする関数
+                |
+                |-- sym_substructure.c 対称な部分構造を出力する関数
+                |
+                |  |-- genlnr_code.c
+                |--|                
+                   |-- permutable.c 成分の大きさで順位付け 
+                        |
+                        |-- clipping.c 原子が KNAG であるかを判定する関数
+                        |
+                        |  |-- genlnr_code.c
+                        |--|
+                           |-- permutable.c 大きさによらず成分で順位付け
+                                |
+                                |  |-- genlnr_code.c
+                                |--|
+                                   |-- permutable.c 成分内で順位付け
+                                        |
+                                        |  |-- genlenr_code.c
+                                        |--|
+                                           |--intentional_ordering.c  強制的に順位付けをする関数
+                                               |                      全列挙する関数
+                                               |
+                                               |-- raise.c  ひとつの原子の順位を高くする関数
+                                               |
+                                               |-- ordering.c
+                                               |
+                                               |-- genlnr_code.c
+                                               |
+                                               |-- intentional_ordering.c  再帰的に呼出し
+
+
+   myqueue.c 
+    |
+    |-- intialize_primary_queue.c  primary_queueを初期化する関数 
+    |
+    |-- add_primary_queue.c primary_queueにひとつ要素を加える関数
+    |
+    |-- remove_primary_queue.c primary_queueからひとつ要素を取り出す関数
+    |
+    |-- intialize_second_queue.c  second_queueを初期化する関数 
+    |
+    |-- add_second_queue.c second_queueにひとつ要素を加える関数
+    |
+    |-- remove_second_queue.c second_queueからひとつ要素を取り出す関数
+ 
+----------------------------------------------------------------
+
+main_casnot-2.3 アルゴリズムに問題あり
+
+ main_casnot-2.2 からの変更点
+
+  1．READMEの改善
+
+  2．permutable.c の追加
+      子を共通にする成分に分解する関数．
+      その成分の大きさで順位付け
+      大きさによらず成分で順位付け( 問題点 1 )
+      成分内で順位付け( 問題点 2 )
+
+  使用している関数
+
+  main_casnot.h  共通のヘッダーファイル
+
+  main_casnot.c  main関数：molファイルの読み込み，分子グラフの作成
+   |
+   |-- atomic_num.c  原子番号をふる関数
+   |
+   |-- recognition.c  部分構造を認識してCANOSTコードをふる関数
+   |
+   |-- assign_codeNum.c  CANOSTコードの優先順位をふる関数
+   |
+
+   以下，各原子で繰り返し
+
+   |
+   |-- fun_bfs.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- genAtom.c  仮想的な原子を加える関数
+   |    |
+   |    |-- myqueue.c
+   |
+   |-- prune_branch.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- myqueue.c
+   |
+   |-- canonicalization.c  層別ネットワークを規範化する関数
+        |
+        |-- first_sort.c  一回目のボトムアップの整列をする関数 
+        |    |
+        |    |-- first_update_tuple.c  1回目のtupleを更新する関数
+        |    |                         tupleには子の番号を入れる
+        |    |
+        |    |-- first_lexsort.c  子とCANOSTコードの順位で整列する関数
+        |    |
+        |    |-- tuple_cmp.c  tupleを比較する関数
+        |    |
+        |    |-- second_update_tuple.c  2回目のtupleを更新する関数
+        |                               tupleには子の順位を入れる
+        |
+        |-- sort_t_d.c  トップダウンに整列する関数
+        |    |
+        |    |-- update_tuple.c  tupleを更新する関数
+        |    |
+        |    |-- lexsort.c tupleに関して整列する関数
+        |
+        |-- ordering.c  sort_b_u と sort_t_d を繰り返す関数
+        |    |
+        |    |-- sort_b_u.c ボトムアップに整列する関数
+        |    |    |
+        |    |    |-- update_tuple.c  tupleを更新する関数
+        |    |    |
+        |    |    |-- lexsort.c tupleに関して整列する関数
+        |    |
+        |    |-- sort_t_d.c
+        |
+        |-- sym_substructure.c 対称な部分構造を出力する関数
+        |
+        |  |-- genlnr_code.c CANOST表記を生成する関数
+        |  |    |
+        |  |    |-- bonds_sort.c  順位にしたがって結合を整列
+        |--|    |
+           |    |-- filiation.c 親子関係を出力する関数
+           |
+           |-- component.c  2層間の連結成分に分解，順位付けする関数
+                |
+                |-- sym_substructure.c 対称な部分構造を出力する関数
+                |
+                |  |-- genlnr_code.c
+                |--|                
+                   |-- permutable.c 成分の大きさで順位付け 
+                        |
+                        |  |-- genlnr_code.c
+                        |--|
+                           |-- permutable.c 大きさによらず成分で順位付け
+                                |
+                                |  |-- genlnr_code.c
+                                |--|
+                                   |-- permutable.c 成分内で順位付け
+                                        |
+                                        |  |-- genlenr_code.c
+                                        |--|
+                                           |--intentional_ordering.c  強制的に順位付けをする関数
+                                               |                      全列挙する関数
+                                               |
+                                               |-- raise.c  ひとつの原子の順位を高くする関数
+                                               |
+                                               |-- ordering.c
+                                               |
+                                               |-- genlnr_code.c
+                                               |
+                                               |-- intentional_ordering.c  再帰的に呼出し
+
+
+   myqueue.c 
+    |
+    |-- intialize_primary_queue.c  primary_queueを初期化する関数 
+    |
+    |-- add_primary_queue.c primary_queueにひとつ要素を加える関数
+    |
+    |-- remove_primary_queue.c primary_queueからひとつ要素を取り出す関数
+    |
+    |-- intialize_second_queue.c  second_queueを初期化する関数 
+    |
+    |-- add_second_queue.c second_queueにひとつ要素を加える関数
+    |
+    |-- remove_second_queue.c second_queueからひとつ要素を取り出す関数
+ 
+ 
+
+----------------------------------------------------------------
+
+main_casnot-2.2
+
+ main_casnot-2.1 からの変更点
+
+  1．prune_branch.c の追加
+      環構造上の原子か否かを判定する関数
+
+  2．component.c の追加
+      2層間の連結成分により整列，順位付けする関数
+
+  3．sym_substructure.c の追加
+      対称(層別ネットワークで同順位)な部分を出力する関数
+
+  4．filiation.c の追加
+      分子ツリーの親子関係を出力する関数
+
+  5．myqueue.c の追加
+      primary_queue と second_queue を用意する関数
+
+  6．headhunt.c の廃止
+      メモリの受渡しが危険なので headhunt は intentional_ordering
+      に吸収
+
+
+ 使用している関数
+
+  main_casnot.h  共通のヘッダーファイル
+
+  main_casnot.c  main関数：molファイルの読み込み，分子グラフの作成
+   |
+   |-- atomic_num.c  原子番号をふる関数
+   |
+   |-- recognition.c  部分構造を認識してCANOSTコードをふる関数
+   |
+   |-- assign_codeNum.c  CANOSTコードの優先順位をふる関数
+   |
+
+   以下，各原子で繰り返し
+
+   |
+   |-- fun_bfs.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- genAtom.c  仮想的な原子を加える関数
+   |    |
+   |    |-- myqueue.c
+   |
+   |-- prune_branch.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- myqueue.c
+   |
+   |-- canonicalization.c  層別ネットワークを規範化する関数
+        |
+        |-- first_sort.c  一回目のボトムアップの整列をする関数 
+        |    |
+        |    |-- first_update_tuple.c  1回目のtupleを更新する関数
+        |    |                         tupleには子の番号を入れる
+        |    |
+        |    |-- first_lexsort.c  子とCANOSTコードの順位で整列する関数
+        |    |
+        |    |-- tuple_cmp.c  tupleを比較する関数
+        |    |
+        |    |-- second_update_tuple.c  2回目のtupleを更新する関数
+        |                               tupleには子の順位を入れる
+        |
+        |-- sort_t_d.c  トップダウンに整列する関数
+        |    |
+        |    |-- update_tuple.c  tupleを更新する関数
+        |    |
+        |    |-- lexsort.c tupleに関して整列する関数
+        |
+        |-- ordering.c  sort_b_u と sort_t_d を繰り返す関数
+        |    |
+        |    |-- sort_b_u.c ボトムアップに整列する関数
+        |    |    |
+        |    |    |-- update_tuple.c  tupleを更新する関数
+        |    |    |
+        |    |    |-- lexsort.c tupleに関して整列する関数
+        |    |
+        |    |-- sort_t_d.c
+        |
+        |-- sym_substructure.c 対称な部分構造を出力する関数
+        |
+        |  |-- genlnr_code.c CANOST表記を生成する関数
+        |  |    |
+        |  |    |-- bonds_sort.c  順位にしたがって結合を整列
+        |--|    |
+           |    |-- filiation.c 親子関係を出力する関数
+           |
+           |-- component.c  2層間の連結成分に分解，順位付けする関数
+                |
+                |-- sym_substructure.c 対称な部分構造を出力する関数
+                |
+                |-- intentional_ordering.c  強制的に順位付けをする関数
+                      |                     全列挙する関数
+                      |
+                      |-- raise.c  ひとつの原子の順位を高くする関数
+                      |
+                      |-- ordering.c
+                      |
+                      |-- genlnr_code.c
+                      |    |
+                      |    |-- bonds_sort.c
+                      |    |
+                      |    |-- filiation.c
+                      |
+                      |-- intentional_ordering.c  再帰的に呼出し
+
+
+   myqueue.c 
+    |
+    |-- intialize_primary_queue.c  primary_queueを初期化する関数 
+    |
+    |-- add_primary_queue.c primary_queueにひとつ要素を加える関数
+    |
+    |-- remove_primary_queue.c primary_queueからひとつ要素を取り出す関数
+    |
+    |-- intialize_second_queue.c  second_queueを初期化する関数 
+    |
+    |-- add_second_queue.c second_queueにひとつ要素を加える関数
+    |
+    |-- remove_second_queue.c second_queueからひとつ要素を取り出す関数
+
+----------------------------------------------------------------
+
+main_casnot-2.1
+
+ main_casnot-2.0 からの変更点
+
+  1．force_ordering.c から intentional_ordering.c へ
+     rise.c から raise.c への名前の変更
+
+  2．first_sort.c の変更
+      追加 first_update_tuple.c，tuple_cmp.c，second_update_tuple.c 
+      変更 first_lexsort.c
+
+  3. first_lexsort.c の変更
+      子の順位で比較したあと，子のCANOSTコードでも比較
+  
+  4．bonds_sort.c の追加
+
+  5．headhunt.c の変更
+      同順位集合を見付ける際の探索もれの解消策を
+      intentional_orderingに移行
+
+  6. update_tuple.c の変更
+      intentional_ordering のために，トップダウン，ボトムアップで 
+      tuple の更新を区別しない
+
+  7．intentional_ordering.c の変更
+      同順位集合を見付ける際の探索もれを解消
+
+
+ 使用している関数
+
+  main_casnot.h  共通のヘッダーファイル
+
+  main_casnot.c  main関数：molファイルの読み込み，分子グラフの作成
+   |
+   |-- atomic_num.c  原子番号をふる関数
+   |
+   |-- recognition.c  部分構造を認識してCANOSTコードをふる関数
+   |
+   |-- assign_codeNum.c  CANOSTコードの優先順位をふる関数
+   |
+
+   以下，各原子で繰り返し
+
+   |
+   |-- fun_bfs.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- genAtom.c  仮想的な原子を加える関数
+   |    |
+   |    |-- intialize_queue.c  Queueを初期化する関数 
+   |    |
+   |    |-- addqueue.c Queueにひとつ要素を加える関数
+   |    |
+   |    |-- removequeue.c Queueからひとつ要素を取り出す関数
+   |
+   |-- canonicalization.c  層別ネットワークを規範化する関数
+        |
+        |-- first_sort.c  一回目のボトムアップの整列をする関数 
+        |    |
+        |    |-- first_update_tuple.c  1回目のtupleを更新する関数
+        |    |                         tupleには子の番号を入れる
+        |    |
+        |    |-- first_lexsort.c  子とCANOSTコードの順位で整列する関数
+        |    |
+        |    |-- tuple_cmp.c  tupleを比較する関数
+        |    |
+        |    |-- second_update_tuple.c  2回目のtupleを更新する関数
+        |                               tupleには子の順位を入れる
+        |
+        |-- sort_t_d.c  トップダウンに整列する関数
+        |    |
+        |    |-- update_tuple.c  tupleを更新する関数
+        |    |
+        |    |-- lexsort.c tupleに関して整列する関数
+        |
+        |-- ordering.c  sort_b_u と sort_t_d を繰り返す関数
+        |    |
+        |    |-- sort_b_u.c ボトムアップに整列する関数
+        |    |    |
+        |    |    |-- update_tuple.c  tupleを更新する関数
+        |    |    |
+        |    |    |-- lexsort.c tupleに関して整列する関数
+        |    |
+        |    |-- sort_t_d.c
+        |
+        |  |-- genlnr_code.c CANOST表記を生成する関数
+        |  |    |
+        |--|    |-- bonds_sort.c  順位にしたがって結合を整列
+           |
+           |-- intentional_ordering.c  強制的に順位付けをする関数
+                |                      全列挙する関数
+                |
+                |-- headhunt.c  同順位の原子の存在する原子の集合を
+                |               見付けてくる関数
+                |
+                |-- raise.c  ひとつの原子の順位を高くする関数
+                |
+                |-- ordering.c
+                |
+                |-- genlnr_code.c
+                |    |
+                |    |-- bonds_sort.c
+                |
+                |-- intentional_ordering.c  再帰的に呼出し
+ 
+
+----------------------------------------------------------------
+
+main_casnot-2.0
+
+ main_cansot-1.xからは大幅に変更されています．
+ 
+ 使用している関数
+
+  main_casnot.h  共通のヘッダーファイル
+
+  main_casnot.c  main関数：molファイルの読み込み，分子グラフの作成
+   |
+   |-- atomic_num.c  原子番号をふる関数
+   |
+   |-- recognition.c  部分構造を認識してCANOSTコードをふる関数
+   |
+   |-- assign_codeNum.c  CANOSTコードの優先順位をふる関数
+   |
+
+   以下，各原子で繰り返し
+
+   |
+   |-- fun_bfs.c  幅優先探索で層別ネットワークを構築する関数
+   |    |
+   |    |-- genAtom.c  仮想的な原子を加える関数
+   |
+   |-- canonicalization.c  層別ネットワークを規範化する関数
+        |
+        |-- first_sort.c  一回目のボトムアップの整列をする関数 
+        |    |
+        |    |-- update_tuple.c  tupleを更新する関数
+        |    |
+        |    |-- first_lexsort.c  子とCANOSTコードの順位で整列する関数
+        |
+        |-- sort_t_d.c  トップダウンに整列する関数
+        |    |
+        |    |-- update_tuple.c
+        |    |
+        |    |-- lexsort.c tupleに関して整列する関数
+        |
+        |-- ordering.c  sort_b_u と sort_t_d を繰り返す関数
+        |    |
+        |    |-- sort_b_u.c ボトムアップに整列する関数
+        |    |
+        |    |-- sort_t_d.c
+        |
+        |  |-- genlnr_code.c CANOST表記を生成する関数
+        |--|
+           |-- force_ordering.c  強制的に順位付けをする関数
+                |                全列挙する関数
+                |
+                |-- headhunt.c  同順位の原子の存在する原子の集合を
+                |               見付けてくる関数
+                |
+                |-- rise.c  ひとつの原子の順位を高くする関数
+                |
+                |-- ordering.c
+                |
+                |-- genlnr_code.c
+                |
+                |-- force_ordering.c  再帰的に呼出し
+             
